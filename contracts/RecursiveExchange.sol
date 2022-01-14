@@ -14,7 +14,7 @@ It is a modification of MarketPlace.sol found here:
 https://github.com/DanielMoralisSamples/25_NFT_MARKET_PLACE/blob/master/contracts/market_place.sol
 */
 
-contract TokenExchange {
+contract RecursiveExchange {
   using Counters for Counters.Counter;
   using Address for address;
 
@@ -50,7 +50,7 @@ contract TokenExchange {
     string memory uri = IERC721(_hostContract).tokenURI(_tokenId)
 
     offeringId.increment();
-    emit  OfferingPlaced(offeringId, _hostContract, _seller, _tokenId, _price, uri);
+    emit  OfferingPlaced(offeringId.current(), _hostContract, _seller, _tokenId, _price, uri);
   }
 
   function closeOffering(bytes32 _offeringId) external payable {
@@ -71,15 +71,21 @@ contract TokenExchange {
       emit BalanceWithdrawn(msg.sender, amount);
   }
 
-  function changeOperator(address _newOperator) external {
-      require(msg.sender == operator,"only the operator can change the current operator");
-      address previousOperator = operator;
-      operator = _newOperator;
-      emit OperatorChanged(previousOperator, operator);
+  function revokeOffering(uint _offeringId) public {
+    require(msg.sender == offeringRegistry[_offeringId].seller,
+      "msg.sender is not the seller of this token");
+
+    offeringRegistry[_offeringId].closed = true;
   }
 
   function viewOfferingNFT(bytes32 _offeringId) external view returns (address, uint, uint, bool){
-      return (offeringRegistry[_offeringId].hostContract, offeringRegistry[_offeringId].tokenId, offeringRegistry[_offeringId].price, offeringRegistry[_offeringId].closed);
+      return (
+        offeringRegistry[_offeringId].seller,
+        offeringRegistry[_offeringId].hostContract,
+        offeringRegistry[_offeringId].tokenId,
+        offeringRegistry[_offeringId].price,
+        offeringRegistry[_offeringId].closed
+      );
   }
 
   function viewBalances(address _address) external view returns (uint) {
