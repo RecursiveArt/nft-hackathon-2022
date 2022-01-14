@@ -27,6 +27,7 @@ contract RecursiveExchange {
 
   struct offering {
       address seller;
+      address buyer;
       address hostContract;
       uint tokenId;
       uint price;
