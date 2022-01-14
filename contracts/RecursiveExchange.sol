@@ -33,7 +33,7 @@ contract RecursiveExchange {
       bool closed;
   }
 
-  mapping (bytes32 => offering) offeringRegistry;
+  mapping (uint256 => offering) offeringRegistry;
   mapping (address => uint) balances;
 
   constructor () {}
@@ -53,16 +53,42 @@ contract RecursiveExchange {
     emit  OfferingPlaced(offeringId.current(), _hostContract, _seller, _tokenId, _price, uri);
   }
 
-  function closeOffering(bytes32 _offeringId) external payable {
+
+
+
+  //**********FIX REPLAY
+  function closeOffering(uint256 _offeringId) external payable {
       require(msg.value >= offeringRegistry[_offeringId].price, "Not enough funds to buy");
       require(offeringRegistry[_offeringId].closed != true, "Offering is closed");
+
+      offeringRegistry[_offeringId].buyer = msg.sender;
+
+
       ERC721 hostContract = ERC721(offeringRegistry[_offeringId].hostContract);
-      hostContract.safeTransferFrom(offeringRegistry[_offeringId].offerer, msg.sender, offeringRegistry[_offeringId].tokenId);
+
+      hostContract.safeTransferFrom(
+        offeringRegistry[_offeringId].offerer,
+        msg.sender,
+        offeringRegistry[_offeringId].tokenId
+      );
+
       offeringRegistry[_offeringId].closed = true;
       balances[offeringRegistry[_offeringId].offerer] += msg.value;
       emit OfferingClosed(_offeringId, msg.sender);
   }
 
+
+
+
+
+
+
+
+
+
+
+  // ********CHANGE TO USE ADRESS LIBRARY
+  // ***********REPLAY PREVENTION
   function withdrawBalance() external {
       require(balances[msg.sender] > 0,"You don't have any balance to withdraw");
       uint amount = balances[msg.sender];
@@ -81,6 +107,7 @@ contract RecursiveExchange {
   function viewOfferingNFT(bytes32 _offeringId) external view returns (address, uint, uint, bool){
       return (
         offeringRegistry[_offeringId].seller,
+        offeringRegistry[_offeringId].buyer,
         offeringRegistry[_offeringId].hostContract,
         offeringRegistry[_offeringId].tokenId,
         offeringRegistry[_offeringId].price,
