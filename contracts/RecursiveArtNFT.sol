@@ -7,6 +7,6 @@ import "hardhat/console.sol";
 
 */
 
-contract TokenExchange {
+contract RecursiveArtNFT {
 
 }
