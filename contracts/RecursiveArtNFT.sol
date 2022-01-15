@@ -14,7 +14,7 @@ This contract is for the NFTHack ETHGlobal hackathon.
 
 contract RecursiveArtNFT is ERC721, ERC721URIStorage {
   using Counters for Counters.Counter;
-  Counters.Counter public tokenId;
+  Counters.Counter public recursiveTokenId;
 
   RecursiveExchange public recursiveExchange;
 
@@ -23,14 +23,14 @@ contract RecursiveArtNFT is ERC721, ERC721URIStorage {
   }
 
   function mintRecursiveNFT(uint256 _purchasedTokenId, string memory _recursiveArtCID) public {
-    address tokenBuyer =
-      RecursiveExchange(recursiveExchange).offeringRegistry[_purchasedTokenId].buyer;
+    (, address tokenBuyer, , , , ) =
+      RecursiveExchange(recursiveExchange).offeringRegistry(_purchasedTokenId);
     require(tokenBuyer == msg.sender,
       "msg.sender does not own the metadata from the sale of this token ID");
 
-    tokenId.increment();
-    _mint(msg.sender, tokenId.current());
-    _setTokenURI(tokenId.current(), _recursiveArtCID);
+    recursiveTokenId.increment();
+    _mint(msg.sender, recursiveTokenId.current());
+    _setTokenURI(recursiveTokenId.current(), _recursiveArtCID);
   }
 
   function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {

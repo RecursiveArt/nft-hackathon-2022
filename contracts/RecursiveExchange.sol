@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
@@ -18,8 +18,8 @@ contract RecursiveExchange {
   using Counters for Counters.Counter;
   using Address for address;
 
-  event OfferingPlaced(bytes32 indexed offeringId, address indexed hostContract, address indexed seller,  uint tokenId, uint price, string uri);
-  event OfferingClosed(bytes32 indexed offeringId, address indexed buyer);
+  event OfferingPlaced(uint256 indexed offeringId, address indexed hostContract, address indexed seller,  uint tokenId, uint price, string uri);
+  event OfferingClosed(uint256 indexed offeringId, address indexed buyer);
   event BalanceWithdrawn (address indexed beneficiary, uint amount);
 
   Counters.Counter public offeringId;
@@ -34,21 +34,21 @@ contract RecursiveExchange {
       bool closed;
   }
 
-  mapping (uint256 => offering) offeringRegistry;
-  mapping (address => uint) balances;
+  mapping (uint256 => offering) public offeringRegistry;
+  mapping (address => uint) public balances;
 
   constructor () {}
 
   function placeOffering (address _seller, address _hostContract, uint _tokenId, uint _price) external {
-    require(msg.sender == IERC721(_hostContract).ownerOf(_tokenId),
+    require(msg.sender == ERC721(_hostContract).ownerOf(_tokenId),
       "msg.sender does not own the token id, therefore cannot sell that token");
 
-    offeringRegistry[offeringId].seller = _seller;
-    offeringRegistry[offeringId].hostContract = _hostContract;
-    offeringRegistry[offeringId].tokenId = _tokenId;
-    offeringRegistry[offeringId].price = _price;
+    offeringRegistry[offeringId.current()].seller = _seller;
+    offeringRegistry[offeringId.current()].hostContract = _hostContract;
+    offeringRegistry[offeringId.current()].tokenId = _tokenId;
+    offeringRegistry[offeringId.current()].price = _price;
 
-    string memory uri = IERC721(_hostContract).tokenURI(_tokenId);
+    string memory uri = ERC721(_hostContract).tokenURI(_tokenId);
 
     offeringId.increment();
     emit  OfferingPlaced(offeringId.current(), _hostContract, _seller, _tokenId, _price, uri);
@@ -64,14 +64,14 @@ contract RecursiveExchange {
 
       offeringRegistry[_offeringId].buyer = msg.sender;
 
-      IERC721(offeringRegistry[_offeringId].hostContract).safeTransferFrom(
-        offeringRegistry[_offeringId].offerer,
+      ERC721(offeringRegistry[_offeringId].hostContract).safeTransferFrom(
+        offeringRegistry[_offeringId].seller,
         msg.sender,
         offeringRegistry[_offeringId].tokenId
       );
 
       offeringRegistry[_offeringId].closed = true;
-      balances[offeringRegistry[_offeringId].offerer] += msg.value;
+      balances[offeringRegistry[_offeringId].seller] += msg.value;
       emit OfferingClosed(_offeringId, msg.sender);
   }
 
@@ -90,7 +90,10 @@ contract RecursiveExchange {
   function withdrawBalance() external {
       require(balances[msg.sender] > 0,"You don't have any balance to withdraw");
       uint amount = balances[msg.sender];
-      payable(msg.sender).transfer(amount);
+
+      Address.sendValue(payable(msg.sender), amount);
+
+
       balances[msg.sender] = 0;
       emit BalanceWithdrawn(msg.sender, amount);
   }
@@ -102,15 +105,17 @@ contract RecursiveExchange {
     offeringRegistry[_offeringId].closed = true;
   }
 
-  function viewOfferingNFT(bytes32 _offeringId) external view returns (address, uint, uint, bool){
-      return (
-        offeringRegistry[_offeringId].seller,
-        offeringRegistry[_offeringId].buyer,
-        offeringRegistry[_offeringId].hostContract,
-        offeringRegistry[_offeringId].tokenId,
-        offeringRegistry[_offeringId].price,
-        offeringRegistry[_offeringId].closed
-      );
+  function viewOfferingNFT(uint256 _offeringId)
+    external view returns (address, address, address, uint, uint, bool)
+  {
+    return (
+      offeringRegistry[_offeringId].seller,
+      offeringRegistry[_offeringId].buyer,
+      offeringRegistry[_offeringId].hostContract,
+      offeringRegistry[_offeringId].tokenId,
+      offeringRegistry[_offeringId].price,
+      offeringRegistry[_offeringId].closed
+    );
   }
 
   function viewBalances(address _address) external view returns (uint) {
