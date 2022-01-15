@@ -10,7 +10,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy('RecursiveExchange', {
     from: deployer,
-    args: [],
     log: true,
   });
 };
