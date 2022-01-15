@@ -103,6 +103,23 @@ describe("RecursiveExchange", () => {
 
     let bal = await ethers.provider.getBalance(seller)
     console.log(bal.toString())
-
   });
+
+  it('')
 });
+
+
+// 1. create an nft that you can then put on the exchange.
+// On the CreateNFT contract, call:
+// mintToken('someCID')
+// You need to add a string that holds the place of a content identifier
+//
+// 2. On RecursiveExchange, call placeOffering() with three arguments
+//   a) the address of the CreateNFT contract
+//   b) your token id from the token you just minted
+//   c) the price in eth you want to sell it for (.00000001 is good so we don't waste test eth)
+//
+// 3. That function call will emit an event.  The first field of that event is offeringId.  Copy that value.
+//
+// 4. change accounts in metamask, then on RecursiveExchange call closeOffering() with the offeringId. Now the token ownership has changed accounts.
+// closeOffering() emits the event that contains the data that will be used to generate the art.
