@@ -5,7 +5,7 @@ import {HardhatUserConfig} from 'hardhat/types';
 import 'hardhat-deploy';
 import '@typechain/hardhat';
 import "@nomiclabs/hardhat-etherscan";
-import "hardhat-gas-reporter";
+// import "hardhat-gas-reporter";
 import "solidity-coverage";
 
 dotenv.config();

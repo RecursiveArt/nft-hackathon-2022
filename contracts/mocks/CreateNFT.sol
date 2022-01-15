@@ -15,26 +15,26 @@ https://github.com/onionpeel/nft-hackathon-2022
 
 contract CreateNFT is ERC721, ERC721URIStorage {
   using Counters for Counters.Counter;
-  Counters.Counter public tokenId;
+  Counters.Counter public mockTokenId;
 
   constructor() ERC721("CreateNFT", "CNFT") {}
 
   function mintToken(string memory metadataCID) public {
-    tokenId.increment();
-    _mint(msg.sender, tokenId.current());
-    _setTokenURI(tokenId.current(), metadataCID);
+    mockTokenId.increment();
+    _mint(msg.sender, mockTokenId.current());
+    _setTokenURI(mockTokenId.current(), metadataCID);
   }
 
-  function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
-    super._burn(tokenId);
+  function _burn(uint256 _tokenId) internal override(ERC721, ERC721URIStorage) {
+    super._burn(_tokenId);
   }
 
-  function tokenURI(uint256 tokenId)
+  function tokenURI(uint256 _tokenId)
     public
     view
     override(ERC721, ERC721URIStorage)
     returns (string memory)
   {
-    return super.tokenURI(tokenId);
+    return super.tokenURI(_tokenId);
   }
 }
