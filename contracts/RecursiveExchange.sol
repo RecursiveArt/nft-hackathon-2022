@@ -9,6 +9,8 @@ import "hardhat/console.sol";
 
 /**
 This contract is for the NFTHack ETHGlobal hackathon.
+Developed in this repo:
+https://github.com/onionpeel/nft-hackathon-2022
 
 It is a modification of MarketPlace.sol found here:
 https://github.com/DanielMoralisSamples/25_NFT_MARKET_PLACE/blob/master/contracts/market_place.sol
@@ -18,68 +20,88 @@ contract RecursiveExchange {
   using Counters for Counters.Counter;
   using Address for address;
 
-  event OfferingPlaced(uint256 indexed offeringId, address indexed hostContract, address indexed seller,  uint tokenId, uint price, string uri);
-  event OfferingClosed(uint256 indexed offeringId, address indexed buyer);
+  event OfferingPlaced(
+    uint256 indexed offeringId,
+    address indexed hostContract,
+    address indexed seller,
+    uint tokenId,
+    uint price,
+    string uri
+  );
+
+  event OfferingClosed(
+    uint256 indexed offeringId,
+    address indexed hostContract,
+    address indexed buyer,
+    address seller,
+    uint tokenId,
+    uint price
+  );
+
   event BalanceWithdrawn (address indexed beneficiary, uint amount);
 
   Counters.Counter public offeringId;
-  Counters.Counter public recursiveNFTNonce;
 
-  struct offering {
-      address seller;
-      address buyer;
-      address hostContract;
-      uint tokenId;
-      uint price;
-      bool closed;
+  struct Offering {
+    address seller;
+    address buyer;
+    address hostContract;
+    uint tokenId;
+    uint price;
+    bool closed;
   }
 
-  mapping (uint256 => offering) public offeringRegistry;
+  mapping (uint256 => Offering) public offeringRegistry;
   mapping (address => uint) public balances;
 
-  constructor () {}
-
-  function placeOffering (address _seller, address _hostContract, uint _tokenId, uint _price) external {
+  function placeOffering (address _hostContract, uint _tokenId, uint _price) external {
     require(msg.sender == ERC721(_hostContract).ownerOf(_tokenId),
       "msg.sender does not own the token id, therefore cannot sell that token");
 
-    offeringRegistry[offeringId.current()].seller = _seller;
+    offeringId.increment();
+
+    offeringRegistry[offeringId.current()].seller = msg.sender;
     offeringRegistry[offeringId.current()].hostContract = _hostContract;
     offeringRegistry[offeringId.current()].tokenId = _tokenId;
     offeringRegistry[offeringId.current()].price = _price;
 
     string memory uri = ERC721(_hostContract).tokenURI(_tokenId);
-
-    offeringId.increment();
-    emit  OfferingPlaced(offeringId.current(), _hostContract, _seller, _tokenId, _price, uri);
+    emit OfferingPlaced(offeringId.current(), _hostContract, msg.sender, _tokenId, _price, uri);
   }
 
 
   function closeOffering(uint256 _offeringId) external payable {
-      require(msg.value >= offeringRegistry[_offeringId].price, "Not enough funds to buy");
-      require(offeringRegistry[_offeringId].closed != true, "Offering is closed");
+    require(msg.value >= offeringRegistry[_offeringId].price, "Not enough funds to buy");
+    require(offeringRegistry[_offeringId].closed != true, "Offering is closed");
 
-      offeringRegistry[_offeringId].buyer = msg.sender;
-      offeringRegistry[_offeringId].closed = true;
-      balances[offeringRegistry[_offeringId].seller] += msg.value;
+    offeringRegistry[_offeringId].buyer = msg.sender;
+    offeringRegistry[_offeringId].closed = true;
+    balances[offeringRegistry[_offeringId].seller] += msg.value;
 
-      ERC721(offeringRegistry[_offeringId].hostContract).safeTransferFrom(
-        offeringRegistry[_offeringId].seller,
-        msg.sender,
-        offeringRegistry[_offeringId].tokenId
-      );
+    ERC721(offeringRegistry[_offeringId].hostContract).safeTransferFrom(
+      offeringRegistry[_offeringId].seller,
+      msg.sender,
+      offeringRegistry[_offeringId].tokenId
+    );
 
-      emit OfferingClosed(_offeringId, msg.sender);
+    emit OfferingClosed(
+      _offeringId,
+      offeringRegistry[_offeringId].hostContract,
+      msg.sender,
+      offeringRegistry[_offeringId].seller,
+      offeringRegistry[_offeringId].tokenId,
+      offeringRegistry[_offeringId].price
+    );
   }
 
 
   function withdrawBalance() external {
-      require(balances[msg.sender] > 0,"You don't have any balance to withdraw");
-      uint amount = balances[msg.sender];
-      balances[msg.sender] = 0;
+    require(balances[msg.sender] > 0,"You don't have any balance to withdraw");
+    uint amount = balances[msg.sender];
+    balances[msg.sender] = 0;
 
-      Address.sendValue(payable(msg.sender), amount);
-      emit BalanceWithdrawn(msg.sender, amount);
+    Address.sendValue(payable(msg.sender), amount);
+    emit BalanceWithdrawn(msg.sender, amount);
   }
 
 

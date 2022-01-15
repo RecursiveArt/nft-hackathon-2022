@@ -9,7 +9,9 @@ import "./RecursiveExchange.sol";
 import "hardhat/console.sol";
 
 /**
-This contract is for the NFTHack ETHGlobal hackathon.
+This contract is for the NFTHack 2022 ETHGlobal hackathon.
+Developed in this repo:
+https://github.com/onionpeel/nft-hackathon-2022
 */
 
 contract RecursiveArtNFT is ERC721, ERC721URIStorage {
