@@ -32,4 +32,17 @@ contract RecursiveArtNFT is ERC721, ERC721URIStorage {
     _mint(msg.sender, tokenId.current());
     _setTokenURI(tokenId.current(), _recursiveArtCID);
   }
+
+  function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+    super._burn(tokenId);
+  }
+
+  function tokenURI(uint256 tokenId)
+    public
+    view
+    override(ERC721, ERC721URIStorage)
+    returns (string memory)
+  {
+    return super.tokenURI(tokenId);
+  }
 }

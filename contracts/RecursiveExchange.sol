@@ -39,7 +39,7 @@ contract RecursiveExchange {
 
   constructor () {}
 
-  function placeOffering (address seller, address _hostContract, uint _tokenId, uint _price) external {
+  function placeOffering (address _seller, address _hostContract, uint _tokenId, uint _price) external {
     require(msg.sender == IERC721(_hostContract).ownerOf(_tokenId),
       "msg.sender does not own the token id, therefore cannot sell that token");
 
@@ -48,7 +48,7 @@ contract RecursiveExchange {
     offeringRegistry[offeringId].tokenId = _tokenId;
     offeringRegistry[offeringId].price = _price;
 
-    string memory uri = IERC721(_hostContract).tokenURI(_tokenId)
+    string memory uri = IERC721(_hostContract).tokenURI(_tokenId);
 
     offeringId.increment();
     emit  OfferingPlaced(offeringId.current(), _hostContract, _seller, _tokenId, _price, uri);
@@ -64,10 +64,7 @@ contract RecursiveExchange {
 
       offeringRegistry[_offeringId].buyer = msg.sender;
 
-
-      ERC721 hostContract = ERC721(offeringRegistry[_offeringId].hostContract);
-
-      hostContract.safeTransferFrom(
+      IERC721(offeringRegistry[_offeringId].hostContract).safeTransferFrom(
         offeringRegistry[_offeringId].offerer,
         msg.sender,
         offeringRegistry[_offeringId].tokenId
