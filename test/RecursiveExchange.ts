@@ -33,11 +33,13 @@ describe("RecursiveExchange", () => {
     await createNFT.connect(accounts[2]).mintToken("someRandomCID");
     expect(await createNFT.ownerOf(ethers.BigNumber.from('1'))).to.equal(seller);
 
+
     await recursiveExchange.connect(accounts[2]).placeOffering(
       createNFT.address,
       ethers.BigNumber.from('1'), //token id
       ethers.utils.parseEther('1') // price in ETH
     );
+
 
     let offering = await recursiveExchange.viewOfferingNFT(ethers.BigNumber.from('1'));
     console.log(offering)
@@ -48,6 +50,7 @@ describe("RecursiveExchange", () => {
     expect(offering[4]).to.equal(ethers.utils.parseEther('1'));
     expect(offering[5]).to.equal(false);
 
-    
+    await recursiveExchange.connect(accounts[2]).revokeOffering(ethers.BigNumber.from('1'));
+    await expect(recursiveExchange.closeOffering(ethers.BigNumber.from('1'))).to.be.reverted;
   });
 });
