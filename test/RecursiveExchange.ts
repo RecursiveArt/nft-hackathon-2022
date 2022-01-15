@@ -29,7 +29,7 @@ describe("RecursiveExchange", () => {
     createNFT = await Promise.resolve(ethers.getContractAt('CreateNFT', CreateNFTDevelopmnet.address) as Promise<CreateNFT>);
   });
 
-  it('Integration', async () => {
+  it('offeringRegistry(), revokeOffering()', async () => {
     await createNFT.connect(accounts[2]).mintToken("someRandomCID");
     expect(await createNFT.ownerOf(ethers.BigNumber.from('1'))).to.equal(seller);
 
@@ -42,7 +42,7 @@ describe("RecursiveExchange", () => {
 
 
     let offering = await recursiveExchange.viewOfferingNFT(ethers.BigNumber.from('1'));
-    console.log(offering)
+    // console.log(offering)
     expect(offering[0]).to.equal(seller);
     expect(offering[1]).to.equal(ethers.constants.AddressZero);
     expect(offering[2]).to.equal(createNFT.address);
@@ -50,7 +50,32 @@ describe("RecursiveExchange", () => {
     expect(offering[4]).to.equal(ethers.utils.parseEther('1'));
     expect(offering[5]).to.equal(false);
 
+
+    let bal = await ethers.provider.getBalance(buyer);
+    // console.log('bal', bal.toString());
+
+    let off = await recursiveExchange.offeringRegistry(ethers.BigNumber.from('1'));
+    // console.log(off.price.toString());
+
     await recursiveExchange.connect(accounts[2]).revokeOffering(ethers.BigNumber.from('1'));
-    await expect(recursiveExchange.closeOffering(ethers.BigNumber.from('1'))).to.be.reverted;
+
+    await expect(recursiveExchange.connect(accounts[1]).closeOffering(
+        ethers.BigNumber.from('1'),
+        {value: ethers.utils.parseEther('1')}
+      )).to.be.revertedWith('Offering is closed');
+  });
+
+  it('closeOffering()', async () => {
+    await createNFT.connect(accounts[2]).mintToken("someRandomCID");
+    expect(await createNFT.ownerOf(ethers.BigNumber.from('1'))).to.equal(seller);
+
+
+    await recursiveExchange.connect(accounts[2]).placeOffering(
+      createNFT.address,
+      ethers.BigNumber.from('1'), //token id
+      ethers.utils.parseEther('1') // price in ETH
+    );
+
+
   });
 });
