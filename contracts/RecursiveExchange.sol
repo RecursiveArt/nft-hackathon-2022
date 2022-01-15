@@ -66,7 +66,13 @@ contract RecursiveExchange {
     offeringRegistry[offeringId.current()].price = _price;
 
     string memory uri = ERC721(_hostContract).tokenURI(_tokenId);
-    emit OfferingPlaced(offeringId.current(), _hostContract, msg.sender, _tokenId, _price, uri);
+    emit OfferingPlaced(
+      offeringId.current(),
+      _hostContract, msg.sender,
+      _tokenId,
+      _price,
+      uri
+    );
   }
 
 

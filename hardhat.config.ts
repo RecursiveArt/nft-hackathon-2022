@@ -43,6 +43,8 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
   deployer: 0,
+  buyer: 1,
+  seller: 2
 },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,

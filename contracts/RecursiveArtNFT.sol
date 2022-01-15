@@ -24,7 +24,11 @@ contract RecursiveArtNFT is ERC721, ERC721URIStorage {
     recursiveExchange = _recursiveExchange;
   }
 
-  function mintRecursiveNFT(uint256 _purchasedTokenId, string memory _recursiveArtCID) public {
+  function mintRecursiveNFT(
+    uint256 _purchasedTokenId,
+    string memory _recursiveArtCID
+  ) public
+  {
     (, address tokenBuyer, , , , ) =
       RecursiveExchange(recursiveExchange).offeringRegistry(_purchasedTokenId);
     require(tokenBuyer == msg.sender,
