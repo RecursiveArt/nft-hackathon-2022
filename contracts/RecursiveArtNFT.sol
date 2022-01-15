@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./RecursiveExchange.sol";
 
 import "hardhat/console.sol";
@@ -14,15 +15,13 @@ Developed in this repo:
 https://github.com/onionpeel/nft-hackathon-2022
 */
 
-contract RecursiveArtNFT is ERC721, ERC721URIStorage {
+contract RecursiveArtNFT is ERC721, ERC721URIStorage, Ownable {
   using Counters for Counters.Counter;
   Counters.Counter public recursiveTokenId;
 
   RecursiveExchange public recursiveExchange;
 
-  constructor(RecursiveExchange _recursiveExchange) ERC721("RecursiveArtNFT", "RANFT") {
-    recursiveExchange = _recursiveExchange;
-  }
+  constructor() ERC721("RecursiveArtNFT", "RANFT") {}
 
   function mintRecursiveNFT(
     uint256 _offeringId,
@@ -50,5 +49,9 @@ contract RecursiveArtNFT is ERC721, ERC721URIStorage {
     returns (string memory)
   {
     return super.tokenURI(tokenId);
+  }
+
+  function setRecursiveExchange(RecursiveExchange _recursiveExchange) public onlyOwner {
+    recursiveExchange = _recursiveExchange;
   }
 }
