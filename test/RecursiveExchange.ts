@@ -50,13 +50,6 @@ describe("RecursiveExchange", () => {
     expect(offering[4]).to.equal(ethers.utils.parseEther('1'));
     expect(offering[5]).to.equal(false);
 
-
-    let bal = await ethers.provider.getBalance(buyer);
-    // console.log('bal', bal.toString());
-
-    let off = await recursiveExchange.offeringRegistry(ethers.BigNumber.from('1'));
-    // console.log(off.price.toString());
-
     await recursiveExchange.connect(accounts[2]).revokeOffering(ethers.BigNumber.from('1'));
 
     await expect(recursiveExchange.connect(accounts[1]).closeOffering(
@@ -69,6 +62,26 @@ describe("RecursiveExchange", () => {
     await createNFT.connect(accounts[2]).mintToken("someRandomCID");
     expect(await createNFT.ownerOf(ethers.BigNumber.from('1'))).to.equal(seller);
 
+    await recursiveExchange.connect(accounts[2]).placeOffering(
+      createNFT.address,
+      ethers.BigNumber.from('1'), //token id
+      ethers.utils.parseEther('1') // price in ETH
+    );
+
+    await createNFT.connect(accounts[2]).approve(
+      recursiveExchange.address,
+      ethers.BigNumber.from('1')
+    );
+
+    await recursiveExchange.connect(accounts[1]).closeOffering(
+      ethers.BigNumber.from('1'),
+      {value: ethers.utils.parseEther('1')}
+    );
+  });
+
+  it('balances', async () => {
+    await createNFT.connect(accounts[2]).mintToken("someRandomCID");
+    expect(await createNFT.ownerOf(ethers.BigNumber.from('1'))).to.equal(seller);
 
     await recursiveExchange.connect(accounts[2]).placeOffering(
       createNFT.address,
@@ -76,6 +89,20 @@ describe("RecursiveExchange", () => {
       ethers.utils.parseEther('1') // price in ETH
     );
 
+    await createNFT.connect(accounts[2]).approve(
+      recursiveExchange.address,
+      ethers.BigNumber.from('1')
+    );
+
+    await recursiveExchange.connect(accounts[1]).closeOffering(
+      ethers.BigNumber.from('1'),
+      {value: ethers.utils.parseEther('1')}
+    );
+
+    expect(await recursiveExchange.viewBalances(seller)).to.equal(ethers.utils.parseEther('1'));
+
+    let bal = await ethers.provider.getBalance(seller)
+    console.log(bal.toString())
 
   });
 });
