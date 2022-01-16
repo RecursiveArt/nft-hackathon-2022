@@ -1,8 +1,50 @@
 
-npx hardhat --network rinkeby deploy
+npx hardhat --network goerli deploy
+npx hardhat --network goerli deploy --reset  (use when re-deploying the same contracts)
 
-npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1"
+npx hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1"
 
+THIS IS ALL GOERLI
+
+
+npx hardhat verify --network goerli 0xDD20EbeC431aEFa98c49D781B89209f142CC4667
+npx hardhat verify --network goerli 0xFde03eAB8bfAC573d3F6784e588577258F5aE3fb
+npx hardhat verify --network goerli 0x1D4882c35383f01C13087aD0df2De5D1d78769ba
+
+
+Goerli
+CreateNFT
+0xDD20EbeC431aEFa98c49D781B89209f142CC4667
+RecursiveExchange
+0xFde03eAB8bfAC573d3F6784e588577258F5aE3fb
+RecursiveArtNFT
+0x1D4882c35383f01C13087aD0df2De5D1d78769ba
+
+
+
+
+
+deploying "RecursiveExchange" (tx: 0xa042c1977dba63320eb2a7fdb0be329293c64b20bd58aea273da4be52a3508bd)...: deployed at 0x0baa3100784cA0dde9df0bfbd2092AFc517cCBDB with 1387136 gas
+deploying "RecursiveArtNFT" (tx: 0xde568f8592b868575ce04d5ad999cf8914c20bdbf52414205e96e66d1a140ba0)...: deployed at 0x0108C9bb28E21566aa3d10A18e93c0fa5BeC7c17 with 2990447 gas
+executing RecursiveArtNFT.setRecursiveExchange (tx: 0x01cd51052e99b359c0142771b0fc145702d4717f0f3a1b02fe64f5c07b7f2824) ...: performed with 46414 gas
+deploying "CreateNFT" (tx: 0x64ba31dc003eca902a0a297de314e283a5a69707556cc112fb3090d3880ab8d2)...: deployed at 0xFFd242523bbACE53A6021BEEF52a132375C6cf0e with 2497476 gas
+
+npx hardhat verify --network goerli 0xFFd242523bbACE53A6021BEEF52a132375C6cf0e
+npx hardhat verify --network goerli 0x0baa3100784cA0dde9df0bfbd2092AFc517cCBDB
+npx hardhat verify --network goerli 0x0108C9bb28E21566aa3d10A18e93c0fa5BeC7c17
+
+Goerli
+CreateNFT
+0xFFd242523bbACE53A6021BEEF52a132375C6cf0e
+RecursiveExchange
+0x0baa3100784cA0dde9df0bfbd2092AFc517cCBDB
+RecursiveArtNFT
+0x0108C9bb28E21566aa3d10A18e93c0fa5BeC7c17
+
+
+
+**************************************
+BELOW IS ALL RINKEBY
 deploying "RecursiveExchange" (tx: 0xd983c98568385cb9f200d485599eb607cac68e76923b6d48487268418662a8d8)...: deployed at 0x301e91d3dA99b7d591625e03C27A67F559116259 with 1387136 gas
 deploying "RecursiveArtNFT" (tx: 0x9de3825a2d70bdfbdff33eeac69265954e42921786a84a235761c10e12a35d34)...: deployed at 0x219C04d9e768f632621fb33120c9735E31C1dcAc with 2707783 gas
 reusing "CreateNFT" at 0xcA620Ea9c5fE250A92F423e564332F829D8ff5EA
@@ -11,9 +53,14 @@ reusing "RecursiveExchange" at 0x301e91d3dA99b7d591625e03C27A67F559116259
 reusing "RecursiveArtNFT" at 0x219C04d9e768f632621fb33120c9735E31C1dcAc
 reusing "CreateNFT" at 0xcA620Ea9c5fE250A92F423e564332F829D8ff5EA
 
+reusing "RecursiveExchange" at 0x301e91d3dA99b7d591625e03C27A67F559116259
+deploying "RecursiveArtNFT" (tx: 0x73636a5490773d3190c01d329eb4dc75620ee050bfa6face97ed47a1d45b0e1d)...: deployed at 0x27748B17F838df7217fc175413C582f64529662F with 2990447 gas
+executing RecursiveArtNFT.setRecursiveExchange (tx: 0x09ccf57f1bd08d80549e6440619155d935c66fdf735fead924d1dec68365606a) ...: performed with 46426 gas
+reusing "CreateNFT" at 0xcA620Ea9c5fE250A92F423e564332F829D8ff5EA
+
 npx hardhat verify --network rinkeby 0xcA620Ea9c5fE250A92F423e564332F829D8ff5EA
 npx hardhat verify --network rinkeby 0x301e91d3dA99b7d591625e03C27A67F559116259
-npx hardhat verify --network rinkeby 0x219C04d9e768f632621fb33120c9735E31C1dcAc "0x301e91d3dA99b7d591625e03C27A67F559116259"
+npx hardhat verify --network rinkeby 0x27748B17F838df7217fc175413C582f64529662F "0x301e91d3dA99b7d591625e03C27A67F559116259"
 
 
 

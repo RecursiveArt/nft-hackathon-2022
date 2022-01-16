@@ -20,13 +20,22 @@ contract RecursiveExchange {
   using Counters for Counters.Counter;
   using Address for address;
 
-  event OfferingPlaced(
+  event OfferingPlacedUserData(
+    uint256 indexed offeringId,
+    address indexed seller,
+    bool indexed closed
+  );
+
+  event OfferingPlacedPrice(
+    uint256 indexed offeringId,
+    uint indexed price,
+    string indexed uri
+  );
+
+  event OfferingPlacedTokenData(
     uint256 indexed offeringId,
     address indexed hostContract,
-    address indexed seller,
-    uint tokenId,
-    uint price,
-    string uri
+    uint indexed tokenId
   );
 
   event OfferingClosedUserData(
@@ -37,7 +46,8 @@ contract RecursiveExchange {
 
   event OfferingClosedPrice(
     uint256 indexed offeringId,
-    uint indexed price
+    uint indexed price,
+    bool indexed closed
   );
 
   event OfferingClosedTokenData(
@@ -46,7 +56,7 @@ contract RecursiveExchange {
     uint indexed tokenId
   );
 
-  event BalanceWithdrawn (address indexed beneficiary, uint amount);
+  event BalanceWithdrawn (address indexed beneficiary, uint indexed amount);
 
   Counters.Counter public offeringId;
 
@@ -74,13 +84,23 @@ contract RecursiveExchange {
     offeringRegistry[offeringId.current()].price = _price;
 
     string memory uri = ERC721(_hostContract).tokenURI(_tokenId);
-    emit OfferingPlaced(
+
+    emit OfferingPlacedUserData(
       offeringId.current(),
-      _hostContract,
       msg.sender,
-      _tokenId,
+      offeringRegistry[offeringId.current()].closed
+    );
+
+    emit OfferingPlacedPrice(
+      offeringId.current(),
       _price,
       uri
+    );
+
+    emit OfferingPlacedTokenData(
+      offeringId.current(),
+      _hostContract,
+      _tokenId
     );
   }
 
@@ -107,7 +127,8 @@ contract RecursiveExchange {
 
     emit OfferingClosedPrice(
       _offeringId,
-      offeringRegistry[_offeringId].price
+      offeringRegistry[_offeringId].price,
+      offeringRegistry[_offeringId].closed
     );
 
     emit OfferingClosedTokenData(

@@ -35,6 +35,12 @@ const config: HardhatUserConfig = {
         process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       tags: ['rinkeby']
     },
+    goerli: {
+      url: process.env.GOERLI_URL || "",
+      accounts:
+        process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
+      tags: ['goerli']
+    }
   },
   typechain: {
     outDir: "./typechain-types",
